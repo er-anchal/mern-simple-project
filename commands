@@ -1,0 +1,10 @@
+in terminal --> mkdir my-mern-app && cd my-mern-app
+mkdir client server
+cd client
+npm create vite@latest . -- --template react
+npm install axios
+
+cd ../server
+npm init -y
+npm install express mongoose cors dotenv
+npm install -D nodemon
