@@ -78,26 +78,4 @@ app.get('/api/users', async (req, res) => {
   res.json(await User.find());
 });
 
-// Update user
-app.put('/api/users/:id', async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(user);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// Delete user
-app.delete('/api/users/:id', async (req, res) => {
-  await User.findByIdAndDelete(req.params.id);
-  res.json({ message: 'Deleted' });
-});
-
-// bulk upload
-app.post('/api/upload', upload.array('images', 4), (req, res) => {
-  const urls = req.files.map(f => f.path);
-  res.json({ urls });
-});
-
 app.listen(5000, () => console.log('Server on http://localhost:5000'));

@@ -22,9 +22,7 @@ export default function Login() {
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error || 'Login failed');
-      localStorage.setItem('userId', body.userId);
-      localStorage.setItem('email',  body.email);
-      navigate('/dashboard');
+      navigate('/login');
     } catch (err) {
       setError(err.message);
     }
