@@ -8,8 +8,6 @@ export default function Dashboard() {
   const loggedUser = localStorage.getItem('email');
 
   const [users, setUsers] = useState([]);
-  const [msg, setMsg]  = useState('');
-  const [addForm, setAddForm] = useState({ email: '', password: '' });
 
   // ── Fetch all users ──────────────────────────────────────────────────────────
   const fetchUsers = async () => {
