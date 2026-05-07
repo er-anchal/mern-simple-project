@@ -10,12 +10,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ─── DB ───────────────────────────────────────────────────────────────────────
+//db
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error(err));
 
-// ─── Cloudinary ───────────────────────────────────────────────────────────────
+//cloudinary
 cloudinary.config({
   cloud_name:  process.env.CLOUD_NAME,
   api_key:     process.env.CLOUD_API_KEY,
@@ -28,7 +28,7 @@ const storage = new CloudinaryStorage({
 });
 const upload = multer({ storage });
 
-// ─── Schema ───────────────────────────────────────────────────────────────────
+// Schema
 const User = mongoose.model('User', new mongoose.Schema({
   email:          { type: String, required: true, unique: true },
   password:       { type: String, required: true },
@@ -38,9 +38,9 @@ const User = mongoose.model('User', new mongoose.Schema({
   images:         [String],
 }));
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
+// routes
 
-// Register — accepts up to 4 individual image fields (image1..image4)
+// Register
 app.post('/api/register',
   upload.fields([
     { name: 'image1', maxCount: 1 },
@@ -78,7 +78,7 @@ app.get('/api/users', async (req, res) => {
   res.json(await User.find());
 });
 
-// Update user (email / password)
+// Update user
 app.put('/api/users/:id', async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -94,7 +94,7 @@ app.delete('/api/users/:id', async (req, res) => {
   res.json({ message: 'Deleted' });
 });
 
-// Post-login image upload (1–4 images)
+// bulk upload
 app.post('/api/upload', upload.array('images', 4), (req, res) => {
   const urls = req.files.map(f => f.path);
   res.json({ urls });

@@ -7,12 +7,13 @@ export default function Dashboard() {
   const navigate   = useNavigate();
   const loggedUser = localStorage.getItem('email');
 
-  const [users,      setUsers]      = useState([]);
-  const [editId,     setEditId]     = useState(null);
+  const [users, setUsers] = useState([]);
+  const [editId, setEditId]  = useState(null);
   const [editForm,   setEditForm]   = useState({ email: '', password: '' });
   const [imgFiles,   setImgFiles]   = useState([]);
   const [uploadedUrls, setUploadedUrls] = useState([]);
-  const [msg,        setMsg]        = useState('');
+  const [msg, setMsg]  = useState('');
+  const [addForm, setAddForm] = useState({ email: '', password: '' });
 
   // ── Fetch all users ──────────────────────────────────────────────────────────
   const fetchUsers = async () => {
@@ -51,6 +52,28 @@ export default function Dashboard() {
     fetchUsers();
   };
 
+// ── Add New User
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    const data = new FormData();
+    data.append('email', addForm.email);
+    data.append('password', addForm.password);
+
+    try {
+      const res = await fetch(`${API}/register`, { method: 'POST', body: data });
+      const body = await res.json();
+      
+      if (!res.ok) throw new Error(body.error || 'Failed to add user');
+      
+      setAddForm({ email: '', password: '' });
+      fetchUsers();
+      setMsg('New user added successfully!');
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+
   // ── Post-login image upload ───────────────────────────────────────────────────
   const handleUpload = async e => {
     e.preventDefault();
@@ -72,6 +95,28 @@ export default function Dashboard() {
           <small className="fs-6 text-muted ms-2">Logged in as: {loggedUser}</small>
         </h3>
         <button className="btn btn-outline-danger btn-sm" onClick={logout}>Logout</button>
+      </div>
+
+{/* ── Add New User Form ── */}
+      <div className="card mb-4 shadow-sm">
+        <div className="card-header bg-success text-white">Add New User</div>
+        <div className="card-body">
+          <form onSubmit={handleAddUser} className="row g-3 align-items-center">
+            <div className="col-auto">
+              <input type="email" className="form-control" placeholder="Email ID"
+                value={addForm.email} 
+                onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))} required />
+            </div>
+            <div className="col-auto">
+              <input type="password" className="form-control" placeholder="Password"
+                value={addForm.password} 
+                onChange={e => setAddForm(f => ({ ...f, password: e.target.value }))} required />
+            </div>
+            <div className="col-auto">
+              <button type="submit" className="btn btn-success">Create User</button>
+            </div>
+          </form>
+        </div>
       </div>
 
       {/* ── Users Table ── */}
@@ -145,7 +190,7 @@ export default function Dashboard() {
       {/* ── Post-login Image Upload ── */}
       <div className="card shadow-sm" style={{ maxWidth: 520 }}>
         <div className="card-header bg-secondary text-white">Upload Images (1–4)</div>
-        <div className="card-body">
+<div className="card-body">
           {msg && <div className="alert alert-info py-2">{msg}</div>}
           <form onSubmit={handleUpload}>
             <div className="mb-3">
@@ -153,14 +198,13 @@ export default function Dashboard() {
               <input type="file" className="form-control" accept="image/*" multiple
                 onChange={e => {
                   setMsg('');
-                  setImgFiles(Array.from(e.target.files).slice(0, 4));
+                  setImgFiles(Array.from(e.target.files).slice(0, 5));
                 }} />
               <small className="text-muted">You can select up to 4 images at once.</small>
             </div>
             <button type="submit" className="btn btn-secondary">Upload to Cloudinary</button>
           </form>
-
-          {/* Preview uploaded images */}
+           {/* can preview the uploaded images immediately after upload without refreshing */}
           {uploadedUrls.length > 0 && (
             <div className="mt-3">
               <p className="fw-semibold">Uploaded:</p>

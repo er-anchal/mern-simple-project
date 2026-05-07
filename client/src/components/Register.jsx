@@ -47,11 +47,17 @@ export default function Register() {
       if (form[k]) data.append(k, form[k]);
     });
 
-    try {
+   try {
       const res  = await fetch(`${API}/register`, { method: 'POST', body: data });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error || 'Registration failed');
-      navigate('/login');
+      
+      // Auto-login the user by saving their new ID and email
+      localStorage.setItem('userId', body._id); 
+      localStorage.setItem('email', body.email);
+      
+      // Redirect directly to the dashboard
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message);
     }
